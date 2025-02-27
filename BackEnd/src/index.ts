@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors"; // ✅ Import CORS middleware
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
+import chatRoutes from "./routes/chatRoutes";
 
 const app = express();
 
@@ -19,5 +20,6 @@ app.use(express.json());
 // ✅ Load Routes AFTER enabling CORS
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/chat", chatRoutes);
 
 export default app;

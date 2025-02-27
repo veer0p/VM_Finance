@@ -33,8 +33,8 @@ export class LoginComponent {
       (response: any) => {
         debugger;
         if (response.token) {
-          // ✅ If token is received, user is authenticated → Go to dashboard
-          localStorage.setItem('token', response.token);
+          this.router.navigate(['/chat']);
+          localStorage.setItem('authToken', response.token);
         } else {
           debugger;
           // ✅ If 2FA is required, go to OTP Verification
