@@ -23,5 +23,12 @@
     <button type="submit" class="form-submit">Login</button>
   </form>
 
-  <a routerLink="/forgot-password" class="form-link">Forgot Password?</a>
+  <!-- Forgot Password Redirect -->
+  <a (click)="goToForgotPassword()" class="form-link">Forgot Password?</a>
+
+  <!-- Sign Up Redirect -->
+  <p class="form-text">
+    Don't have an account?
+    <a (click)="goToSignUp()" class="form-link">Sign Up</a>
+  </p>
 </div>

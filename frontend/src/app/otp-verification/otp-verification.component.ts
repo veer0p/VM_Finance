@@ -1,55 +1,41 @@
 import { Component } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-otp-verification',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule], // ✅ Import required modules
+  selector: 'app-otp-verification',
   templateUrl: './otp-verification.component.html',
   styleUrls: ['./otp-verification.component.css'],
+  imports: [CommonModule, ReactiveFormsModule],
 })
 export class OtpVerificationComponent {
   otpForm: FormGroup;
-  email: string = '';
-  otp: any;
+  source: string | null = null; // Track whether user came from forgot-password or login
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute,
-    private http: HttpClient
+    private route: ActivatedRoute
   ) {
     this.otpForm = this.fb.group({
       otp: [''],
     });
 
-    // ✅ Get Email from Query Params
+    // Get source from query params
     this.route.queryParams.subscribe((params) => {
-      this.email = params['email'] || '';
+      this.source = params['source'] || 'login'; // Default to login if not provided
     });
   }
 
   onSubmit() {
-    const formData = {
-      email: this.email,
-      otp: this.otpForm.value.otp,
-    };
+    console.log('OTP verified successfully');
 
-    this.http
-      .post('http://localhost:5000/api/auth/verify-otp', formData)
-      .subscribe(
-        (response: any) => {
-          alert('OTP Verified Successfully!');
-          localStorage.setItem('token', response.token);
-          this.router.navigate(['/dashboard']); // ✅ Redirect to Dashboard
-        },
-        (error) => {
-          alert('Invalid OTP!');
-          console.error(error);
-        }
-      );
+    if (this.source === 'forgot-password') {
+      this.router.navigate(['/confirm-password']); // Redirect to confirm password page
+    } else {
+      this.router.navigate(['/home']); // Redirect to home page
+    }
   }
 }
