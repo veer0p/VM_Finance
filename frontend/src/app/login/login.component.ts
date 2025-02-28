@@ -33,11 +33,6 @@ export class LoginComponent {
   }
 
   onSubmit() {
-    if (this.loginForm.invalid) {
-      this.errorMessage = 'Please enter valid email and password.';
-      return;
-    }
-
     this.loading = true; // ✅ Show loading state
     this.errorMessage = ''; // Reset error message
 

@@ -44,15 +44,10 @@ export class SignUpComponent {
   }
 
   onSubmit() {
-    if (this.signUpForm.invalid) {
-      this.signUpForm.markAllAsTouched();
-      return;
-    }
-
     this.authService.signUp(this.signUpForm.value).subscribe(
       (res) => {
         alert('Registration Successful!');
-        this.router.navigate(['/otp-verification']);
+        this.router.navigate(['/login']);
       },
       (err) => {
         alert('Registration Failed: ' + err.error.message);
