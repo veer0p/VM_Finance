@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 export class OtpVerificationComponent {
   otpForm: FormGroup;
   source: string | null = null; // Track whether user came from forgot-password or login
+  otp: any;
 
   constructor(
     private fb: FormBuilder,
