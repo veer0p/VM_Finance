@@ -35,7 +35,7 @@ export class ForgotPasswordComponent {
         () => {
           alert('OTP sent to your email!');
           this.router.navigate(['/otp-verification'], {
-            queryParams: { email: formData.email },
+            queryParams: { email: formData.email, source: 'forgot-password' }, // ✅ Pass source
           });
         },
         (error) => {

@@ -187,25 +187,51 @@ export const verifyOTP = async (req: Request, res: Response): Promise<void> => {
 };
 
 // 📌 Verify OTP & Reset Password
+// export const resetPassword = async (
+//   req: Request,
+//   res: Response
+// ): Promise<void> => {
+//   try {
+//     const { email, otp, newPassword } = req.body;
+//     const user = await User.findByEmail(email);
+
+//     if (!user || user.otp !== otp || new Date(user.OtpExpiresAt) < new Date()) {
+//       res.status(400).json({ message: "Invalid or expired OTP" });
+//       return;
+//     }
+
+//     // Hash the new password
+//     const hashedPassword = await bcrypt.hash(newPassword, 10);
+//     await User.updatePassword(email, hashedPassword);
+
+//     // Clear OTP after successful reset
+//     await User.clearOTP(email);
+
+//     res.status(200).json({ message: "Password reset successfully" });
+//   } catch (error: any) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+
 export const resetPassword = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const { email, otp, newPassword } = req.body;
-    const user = await User.findByEmail(email);
+    const { email, newPassword } = req.body;
 
-    if (!user || user.otp !== otp || new Date(user.OtpExpiresAt) < new Date()) {
-      res.status(400).json({ message: "Invalid or expired OTP" });
+    // Find user by email
+    const user = await User.findByEmail(email);
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
       return;
     }
 
     // Hash the new password
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    await User.updatePassword(email, hashedPassword);
 
-    // Clear OTP after successful reset
-    await User.clearOTP(email);
+    // Update user's password
+    await User.updatePassword(email, hashedPassword);
 
     res.status(200).json({ message: "Password reset successfully" });
   } catch (error: any) {

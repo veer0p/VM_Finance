@@ -46,9 +46,8 @@ export class LoginComponent {
           localStorage.setItem('authToken', response.token);
           this.router.navigate(['/home']); // ✅ Redirect to home
         } else {
-          // ✅ If 2FA (OTP) is required
           this.router.navigate(['/otp-verification'], {
-            queryParams: { email: formData.email },
+            queryParams: { email: formData.email, source: 'login' }, // ✅ Pass source
           });
         }
       },

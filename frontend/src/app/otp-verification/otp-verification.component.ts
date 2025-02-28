@@ -32,9 +32,11 @@ export class OtpVerificationComponent {
 
   onSubmit() {
     console.log('OTP verified successfully');
-
+    debugger;
     if (this.source === 'forgot-password') {
-      this.router.navigate(['/confirm-password']); // Redirect to confirm password page
+      this.router.navigate(['/confirm-password'], {
+        queryParams: { email: this.route.snapshot.queryParams['email'] }, // ✅ Pass email
+      });
     } else {
       this.router.navigate(['/home']); // Redirect to home page
     }
