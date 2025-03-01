@@ -35,7 +35,7 @@ export class OtpVerificationComponent {
     debugger;
     if (this.source === 'forgot-password') {
       this.router.navigate(['/confirm-password'], {
-        queryParams: { email: this.route.snapshot.queryParams['email'] }, // ✅ Pass email
+        queryParams: { email: this.route.snapshot.queryParams['email'] },
       });
     } else {
       this.router.navigate(['/home']); // Redirect to home page

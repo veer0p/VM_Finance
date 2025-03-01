@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import User from "../models/userModel";
 
+// 📌 Get User by ID
 export const getUserDetails = async (
   req: Request,
   res: Response
@@ -12,7 +13,7 @@ export const getUserDetails = async (
       return;
     }
 
-    const user = await User.findById(userId);
+    const user = await User.findByPk(userId); // ✅ Correct Sequelize method
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
@@ -24,6 +25,7 @@ export const getUserDetails = async (
   }
 };
 
+// 📌 Update User Details
 export const updateUserDetails = async (
   req: Request,
   res: Response
@@ -36,9 +38,11 @@ export const updateUserDetails = async (
     }
 
     const updatedData = req.body;
-    const result = await User.updateUser(userId, updatedData);
+    const [updatedRows] = await User.update(updatedData, {
+      where: { id: userId },
+    }); // ✅ Correct method
 
-    if (result.affectedRows === 0) {
+    if (updatedRows === 0) {
       res.status(404).json({ message: "User not found or no changes made" });
       return;
     }
@@ -49,12 +53,13 @@ export const updateUserDetails = async (
   }
 };
 
+// 📌 Get All Users
 export const getAllUsers = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
-    const users = await User.getAllUsers();
+    const users = await User.findAll(); // ✅ Correct Sequelize method
     res.status(200).json(users);
   } catch (error: any) {
     res.status(500).json({ message: error.message });

@@ -1,125 +1,188 @@
-import { Pool } from "mysql2/promise";
-import pool from "../config/db";
+import { DataTypes, Model, Op } from "sequelize";
+import { sequelize } from "../config/db";
 
-class User {
-  // ✅ Check if 2FA is enabled for a user
-  static async is2FAEnabled(email: string): Promise<boolean> {
-    const [rows]: any = await pool.query(
-      "SELECT is2FAEnabled FROM users WHERE email = ?",
-      [email]
-    );
-    return rows.length > 0 ? rows[0].is2FAEnabled === 1 : false;
-  }
-
-  // ✅ Enable 2FA for a user
-  static async enable2FA(email: string): Promise<any> {
-    const [result]: any = await pool.query(
-      "UPDATE users SET is2FAEnabled = 1 WHERE email = ?",
-      [email]
-    );
-    return result;
-  }
-
-  // ✅ Disable 2FA for a user
-  static async disable2FA(email: string): Promise<any> {
-    const [result]: any = await pool.query(
-      "UPDATE users SET is2FAEnabled = 0 WHERE email = ?",
-      [email]
-    );
-    return result;
-  }
-
-  // ✅ Find a user by email
-  static async findByEmail(email: string): Promise<any> {
-    const [rows]: any = await pool.query(
-      "SELECT * FROM users WHERE email = ?",
-      [email]
-    );
-    return rows[0];
-  }
-
-  // ✅ Find a user by ID (fix for findById error)
-  static async findById(id: number): Promise<any> {
-    const [rows]: any = await pool.query("SELECT * FROM users WHERE id = ?", [
-      id,
-    ]);
-    return rows[0]; // Return the user or null if not found
-  }
-
-  // ✅ Update user details (fix for update error)
-  static async updateUser(id: number, updatedData: any): Promise<any> {
-    const fields = Object.keys(updatedData)
-      .map((key) => `${key} = ?`)
-      .join(", ");
-
-    const values = Object.values(updatedData);
-    values.push(id); // Add ID as last parameter for WHERE clause
-
-    const [result]: any = await pool.query(
-      `UPDATE users SET ${fields} WHERE id = ?`,
-      values
-    );
-
-    return result;
-  }
-
-  // ✅ Create a new user
-  static async createUser(
-    firstName: string,
-    lastName: string,
-    dob: string,
-    email: string,
-    phoneNumber: string,
-    password: string
-  ): Promise<any> {
-    const [result]: any = await pool.query(
-      "INSERT INTO users (firstName, lastName, dob, email, phoneNumber, password) VALUES (?, ?, ?, ?, ?, ?)",
-      [firstName, lastName, dob, email, phoneNumber, password]
-    );
-    return result;
-  }
-
-  // ✅ Get all active users (Excludes inactive or deleted users)
-  static async getAllUsers(): Promise<any> {
-    const [rows]: any = await pool.query(
-      "SELECT id, firstName, lastName, email, phoneNumber, createdAt, updatedAt FROM users WHERE isDeleted = false AND isActive = true"
-    );
-    return rows;
-  }
-
-  // ✅ Store OTP in Database
-  static async storeOTP(
-    email: string,
-    otp: string,
-    expiresAt: Date
-  ): Promise<any> {
-    const [result]: any = await pool.query(
-      "UPDATE users SET otp = ?, OtpExpiresAt = ? WHERE email = ?",
-      [otp, expiresAt, email]
-    );
-    return result;
-  }
-
-  // ✅ Update User Password
-  static async updatePassword(
-    email: string,
-    newPassword: string
-  ): Promise<any> {
-    const [result]: any = await pool.query(
-      "UPDATE users SET password = ? WHERE email = ?",
-      [newPassword, email]
-    );
-    return result;
-  }
-
-  // ✅ Clear OTP After Reset
-  static async clearOTP(email: string): Promise<any> {
-    const [result]: any = await pool.query(
-      "UPDATE users SET otp = NULL, OtpExpiresAt = NULL WHERE email = ?",
-      [email]
-    );
-    return result;
-  }
+class User extends Model {
+  public id!: string;
+  public first_name!: string;
+  public last_name!: string;
+  public dob?: Date;
+  public email!: string;
+  public phone_number?: string;
+  public password!: string;
+  public is_deleted!: boolean;
+  public is_active!: boolean;
+  public is_verified!: boolean;
+  public is_email_verified!: boolean;
+  public email_verification_otp?: string;
+  public created_at!: Date;
+  public updated_at!: Date;
+  public failed_login_attempts!: number;
+  public last_login?: Date;
+  public password_reset_token?: string;
+  public password_reset_expires?: Date;
+  public role!: "user" | "admin" | "moderator";
+  public is_2fa_enabled!: boolean;
+  public two_factor_secret?: string;
+  public otp?: string;
+  public otp_expires_at?: Date;
+  public google_id?: string;
+  public facebook_id?: string;
+  public apple_id?: string;
+  public profile_image_url?: string;
+  public bio?: string;
+  public about_me?: string;
 }
+
+// Define Sequelize Model
+User.init(
+  {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
+    },
+    first_name: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    last_name: {
+      type: DataTypes.STRING(50),
+      allowNull: false,
+    },
+    dob: {
+      type: DataTypes.DATEONLY, // DATEONLY instead of DATE if you only store birthdates
+      allowNull: true,
+    },
+    email: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      unique: true,
+    },
+    phone_number: {
+      type: DataTypes.STRING(20),
+      allowNull: true,
+      unique: true,
+    },
+    password: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    is_deleted: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    is_active: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
+    is_verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    is_email_verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    email_verification_otp: {
+      type: DataTypes.STRING(6),
+      allowNull: true,
+    },
+    created_at: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+    },
+    updated_at: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    failed_login_attempts: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0,
+    },
+    last_login: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    password_reset_token: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    password_reset_expires: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    role: {
+      type: DataTypes.ENUM("user", "admin", "moderator"),
+      defaultValue: "user",
+    },
+    is_2fa_enabled: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
+    two_factor_secret: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    otp: {
+      type: DataTypes.STRING(6),
+      allowNull: true,
+    },
+    otp_expires_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    google_id: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    facebook_id: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    apple_id: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    profile_image_url: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    bio: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    about_me: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+  },
+  {
+    sequelize,
+    tableName: "users",
+    createdAt: "created_at",
+    updatedAt: "updated_at",
+    indexes: [
+      {
+        unique: true,
+        fields: ["email"],
+      },
+      {
+        unique: true,
+        fields: ["phone_number"],
+      },
+      {
+        unique: true,
+        fields: ["google_id", "facebook_id", "apple_id"],
+        where: {
+          [Op.or]: [
+            { google_id: { [Op.ne]: null } },
+            { facebook_id: { [Op.ne]: null } },
+            { apple_id: { [Op.ne]: null } },
+          ],
+        },
+      },
+    ],
+  }
+);
 
 export default User;

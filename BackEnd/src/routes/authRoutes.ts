@@ -1,24 +1,24 @@
-import express from "express";
+import { Router } from "express";
 import {
   signup,
+  verifyEmail,
   login,
-  sendOTP,
+  verifyLoginOTP,
+  requestToggle2FA,
+  verifyToggle2FA,
+  requestPasswordReset,
   resetPassword,
-  verifyOTP,
 } from "../controllers/authController";
 
-const router = express.Router();
+const router = Router();
 
-// User Signup route
 router.post("/signup", signup);
-
-// User Login route
+router.post("/verify-email", verifyEmail);
 router.post("/login", login);
-
-router.post("/send-otp", sendOTP);
-
+router.post("/verify-Login-OTP", verifyLoginOTP);
+router.post("/request-2FA", requestToggle2FA);
+router.post("/verify-2FA-OTP", verifyToggle2FA);
+router.post("/request-password-reset", requestPasswordReset);
 router.post("/reset-password", resetPassword);
 
-router.post("/verify-otp", verifyOTP);
-
-export default router;
+export default router; // ✅ Make sure you're exporting the router
