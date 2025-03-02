@@ -3,6 +3,7 @@ import cors from "cors"; // ✅ Import CORS middleware
 import authRoutes from "./routes/authRoutes";
 import userRoutes from "./routes/userRoutes";
 import chatRoutes from "./routes/chatRoutes";
+import messageRouters from "./routes/messageRoutes";
 
 const app = express();
 
@@ -21,5 +22,6 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/messages", messageRouters);
 
 export default app;

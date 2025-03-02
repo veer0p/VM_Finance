@@ -15,7 +15,7 @@ export const appRoutes: Routes = [
   { path: 'forgot-password', component: ForgotPasswordComponent },
   { path: 'otp-verification', component: OtpVerificationComponent },
   { path: 'confirm-password', component: ConfirmPasswordComponent }, // ✅ New Route
-  { path: 'chat', component: ChatComponent, canActivate: [AuthGuard] },
+  { path: 'chat', component: ChatComponent },
   { path: 'home', component: HomeComponent, canActivate: [AuthGuard] },
   { path: '**', redirectTo: '/login' },
 ];

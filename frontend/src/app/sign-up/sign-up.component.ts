@@ -24,14 +24,12 @@ export class SignUpComponent {
       {
         first_name: ['', Validators.required],
         last_name: ['', Validators.required],
-        dob: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
         phone_number: [
           '',
           [Validators.required, Validators.pattern(/^\d{10}$/)],
         ],
         password: ['', [Validators.required, Validators.minLength(6)]],
-        confirmPassword: ['', Validators.required],
       },
       { validator: this.passwordMatchValidator }
     );
